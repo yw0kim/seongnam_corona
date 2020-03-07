@@ -6,6 +6,8 @@ def main():
     crawlClass = crawl.CoronaCrawlClass()
     crawlClass.crawl_stats()
     crawlClass.crawl_track()
+    crawlClass.align_track_str()
+    crawlClass.manage_files()
 
     #Handler = serve_api.MyHandler(crawlClass.stat_dict,
     #                                  crawlClass.seongnam_track_list,
