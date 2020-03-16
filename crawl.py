@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 # import datetime as pydatetime
 
 class CoronaCrawlClass:
-    def __init__(self, url='http://www.seongnam.go.kr/coronaIndex.html'):
+    # def __init__(self, url='http://www.seongnam.go.kr/coronaIndex.html'):
+    def __init__(self, url='https://www.seongnam.go.kr/prgm/corona/coronaList2.do'):
         self.crawl_url = url
         self.response = requests.get(self.crawl_url)
         self.html = self.response.text
@@ -17,7 +18,10 @@ class CoronaCrawlClass:
     def crawl_stats(self):
         # print(html)
         # table = soup.find_all("table")
-        corona_value = self.soup.select('#corona_page > div.corona_page_top > div > div.contents_all > ul')
+        # corona_value = self.soup.select('#corona_page > div.corona_page_top > div > div.contents_all > ul')
+        # corona_value = self.soup.select('#corona_page > div.corona_page_top > div > div.contents_all > div.pc_view > table')
+        corona_value = self.soup.select('#board_group2 > table > tbody > tr.plus_view.open > td > div > table > tbody')
+        print(corona_value)
         str_corona_value = corona_value[0].text + '\n'
 
         p = re.compile('\d+.\n')
