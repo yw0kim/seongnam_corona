@@ -1,5 +1,6 @@
 import crawl
 import serve_api
+import sys
 from http.server import HTTPServer
 
 def main():
@@ -15,6 +16,8 @@ def main():
 
     httpd = HTTPServer(('localhost', 19158), serve_api.MyHandler)
 
+    buffer = 1
+    sys.stderr = open('logfile.txt', 'w', buffer)
     httpd.serve_forever()
 
 if __name__ == "__main__":
