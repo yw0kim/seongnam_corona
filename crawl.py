@@ -4,8 +4,8 @@ from bs4 import BeautifulSoup
 # import datetime as pydatetime
 
 class CoronaCrawlClass:
-    # def __init__(self, url='http://www.seongnam.go.kr/coronaIndex.html'):
-    def __init__(self, url='https://www.seongnam.go.kr/prgm/corona/coronaList2.do'):
+    def __init__(self, url='http://www.seongnam.go.kr/coronaIndex.html'):
+    # def __init__(self, url='https://www.seongnam.go.kr/prgm/corona/coronaList2.do'):
         self.crawl_url = url
         self.response = requests.get(self.crawl_url)
         self.html = self.response.text
@@ -18,19 +18,15 @@ class CoronaCrawlClass:
     def crawl_stats(self):
         # print(html)
         # table = soup.find_all("table")
-        # corona_value = self.soup.select('#corona_page > div.corona_page_top > div > div.contents_all > ul')
-        # corona_value = self.soup.select('#corona_page > div.corona_page_top > div > div.contents_all > div.pc_view > table')
-        corona_value = self.soup.select('#board_group2 > table > tbody > tr.plus_view.open > td > div > table > tbody')
-        print(corona_value)
-        str_corona_value = corona_value[0].text + '\n'
+        stat_title = self.soup.select('#corona_page > div.corona_page_top > div > div.contents_all > div.pc_view > table > thead')
+        stat_value = self.soup.select('#corona_page > div.corona_page_top > div > div.contents_all > div.pc_view > table > tbody')
+        stat_title_list = [v for v in stat_title[0].text.split('\n') if v and v != '확진환자']
+        stat_value_list = [v for v in stat_value[0].text.split('\n') if v]
 
-        p = re.compile('\d+.\n')
-        before_end = 1
-        for line in p.finditer(str_corona_value):
-            self.stat_dict[str_corona_value[before_end:line.start()]] = str_corona_value[line.start():line.end() - 1]
-            before_end = line.end()
+        for i in range(0, len(stat_value_list)):
+            self.stat_dict[stat_title_list[(i+4)%8]] = stat_value_list[i]
 
-    #        print(self.stat_dict)
+        # print(self.stat_dict)
 
     def crawl_track(self):
         track_infos = self.soup.select('#board_group1 > table > tbody')
@@ -38,8 +34,11 @@ class CoronaCrawlClass:
         patient_track_infos = " ".join(str_track_infos.split())
         # print(patient_track_infos)
 
+        # ((성남#\d+ \( (\d\d년생|(남|여)) \/ (\d\d년생|(남|여)) \/ \D+((\d{1,20}(동|단지))|) 거주(( \/ \D+)|) \) (|- 확인중 )확진일 \d+월 \d+일)|(타지역 확진자 \( \D+\d+번 \d+년생 \/ (남|여) \/ \D+거주 \) 확진일 \d+월 \d+일)|(성남#18 \( 남 \/ 55년생 \/ 분당구 이매동 거주 \/ 성남#4 접촉자 \) 확진일 3월 9일)|(서울#138 \( 87년생 \/ 남 \/ 중원구 은행동 거주 \/ 은혜의 강 교회 \) 확진일 3월 9일))
+        # ((성남#\d+ \( (\d\d년생|(남|여)) \/ (\d\d년생|(남|여)) \/ \D+((\d{1,20}(동|단지))|) 거주(( \/ \D+)|) \) (|- 확인중 )확진일 \d+월 \d+일)|(타지역 확진자 \( \D+\d+번 \d+년생 \/ (남|여) \/ \D+거주 \) 확진일 \d+월 \d+일))
+        # ((성남#\d+ \( \d\d년생 \/ (남|여) \/ \D+\) 확진일 \d+월 \d+일)|(타지역 확진자 \( \D+\d+번 \d+년생 \/ (남|여) \/ \D+거주 \) 확진일 \d+월 \d+일))
         p = re.compile(
-            '((성남#\d+ \( \d\d년생 \/ (남|여) \/ \D+\) 확진일 \d+월 \d+일)|(타지역 확진자 \( \D+\d+번 \d+년생 \/ (남|여) \/ \D+거주 \) 확진일 \d+월 \d+일))')
+            '((성남#\d+ \( (\d\d년생|(남|여)) \/ (\d\d년생|(남|여)) \/ \D+((\d{1,20}(동|단지))|) 거주(( \/ \D+)|) \) (|- 확인중 )확진일 \d+월 \d+일)|(타지역 확진자 \( \D+\d+번 \d+년생 \/ (남|여) \/ \D+거주 \) 확진일 \d+월 \d+일)|(성남#18 \( 남 \/ 55년생 \/ 분당구 이매동 거주 \/ 성남#4 접촉자 \) 확진일 3월 9일)|(서울#138 \( 87년생 \/ 남 \/ 중원구 은행동 거주 \/ 은혜의 강 교회 \) 확진일 3월 9일))')
 
         before_contents_start = 0
         before_contents_end = 0
@@ -90,12 +89,18 @@ class CoronaCrawlClass:
             self.track_dict[patient] = new_str
 
     def manage_files(self):
-        seongnam_track_dict = {}
+        # seongnam_track_dict = {}
+        # 제생병원
+        hospital1_dict = {}
+        # 은혜의 강 교회
+        church1_dict = {}
         around_track_dict = {}
 
         for patient, track_info in self.track_dict.items():
-            if "성남" in patient:
-                seongnam_track_dict[patient] = track_info
+            if "은혜의 강" in patient:
+                church1_dict[patient] = track_info
+            elif "제생병원" in patient:
+                hospital1_dict[patient] = track_info
             else:
                 around_track_dict[patient] = track_info
 
@@ -104,10 +109,16 @@ class CoronaCrawlClass:
             fw.write(key + ' : ' +  value + '\n')
         fw.close()
 
-        fw = open('data/sn_patients.txt', 'w')
-        for sn_patient, track_info in seongnam_track_dict.items():
-            fw.write(sn_patient+'\n')
+        fw = open('data/hp1_patients.txt', 'w')
+        for hp_patient, track_info in hospital1_dict.items():
+            fw.write(hp_patient+'\n')
             fw.write(track_info+'\n')
+        fw.close()
+
+        fw = open('data/ch1_patients.txt', 'w')
+        for ch_patient, track_info in church1_dict.items():
+            fw.write(ch_patient + '\n')
+            fw.write(track_info + '\n')
         fw.close()
 
         fw = open('data/ar_patients.txt', 'w')

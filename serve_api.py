@@ -12,7 +12,9 @@ class MyHandler(SimpleHTTPRequestHandler):
         if self.path == "/v1/sn_corona/sn_stats":
             self.__response_sn_stats()
             return
-        elif self.path == "/v1/sn_corona/sn_patients":
+        elif self.path == "/v1/sn_corona/hp1_patients":
+            pass
+        elif self.path == "/v1/sn_corona/ch1_patients":
             pass
         elif self.path == "/v1/sn_corona/ar_patients":
             pass
