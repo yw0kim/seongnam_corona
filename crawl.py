@@ -35,7 +35,7 @@ class CoronaCrawlClass:
         # print(patient_track_infos)
 
         p = re.compile(
-            '((성남#\d+ \( \d\d년생 \/ (남|여) \/ \D+ \) 확진일 \d+월 \d+일)|(타지역 확진자 \( \D+\d+번 \d+년생 \/ (남|여) \/ \D+거주 \) 확진일 \d+월 \d+일))')
+            '((성남#\d+ \( \d\d년생 \/ (남|여) \/ \D+\) 확진일 \d+월 \d+일)|(타지역 확진자 \( \D+\d+번 \d+년생 \/ (남|여) \/ \D+거주 \) 확진일 \d+월 \d+일))')
 
         before_contents_start = 0
         before_contents_end = 0
@@ -51,6 +51,7 @@ class CoronaCrawlClass:
             before_contents_start = patient.end() + 7
 
         self.track_dict[before_patient_id] = patient_track_infos[before_contents_start:]
+
 
     def align_track_str(self):
         p1 = re.compile('((\d+월 \d+일~\d+월 \d+일)|(\d+월 \d+일))')
@@ -93,6 +94,11 @@ class CoronaCrawlClass:
                 seongnam_track_dict[patient] = track_info
             else:
                 around_track_dict[patient] = track_info
+
+        fw = open('data/sn_stats.txt', 'w')
+        for key, value in self.stat_dict.items():
+            fw.write(key + ' : ' +  value + '\n')
+        fw.close()
 
         fw = open('data/sn_patients.txt', 'w')
         for sn_patient, track_info in seongnam_track_dict.items():

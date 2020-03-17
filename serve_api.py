@@ -1,25 +1,47 @@
 from http.server import  SimpleHTTPRequestHandler
 from io import BytesIO
+import json
 
 class MyHandler(SimpleHTTPRequestHandler):
 
-    '''
-    def __init__(self, stat_dict, seongnam_track_list, around_track_list):
-        self.stat_dict = stat_dict
-        self.seongnam_track_list = seongnam_track_list
-        self.around_tack_list = around_track_list
-    '''
-
     def do_GET(self):
-        print(self.path)
-        if not self.path.startswith("/v1/sn_corona"):
+        if self.headers['Authorization'] != '12034u8014u8r2ejd8123j1423412341adf1':
             self.send_response(502)
             self.end_headers()
             return
+        if self.path == "/v1/sn_corona/sn_stats":
+            self.__response_sn_stats()
+            return
+        elif self.path == "/v1/sn_corona/sn_patients":
+            pass
+        elif self.path == "/v1/sn_corona/ar_patients":
+            pass
         else:
-            self.send_response(200)
+            self.send_response(502)
             self.end_headers()
-            self.wfile.write(b'Hello, world!                       asdfasdf')
+            return
+
+    def __response_sn_stats(self):
+        fr = open('data/sn_stats.txt', 'r')
+        data = fr.read()
+        fr.close()
+        self.send_response(200)
+#        self.send_header("Content-type", "text/plain")
+        self.send_header("Content-type", "application/json")
+        self.end_headers()
+        response = BytesIO()
+        str_json = {
+            "text":data
+        }
+        #response.write(bytes(data, 'utf-8'))
+        # response.write(json.dumps(data))
+        self.wfile.write(bytes(json.dumps(str_json), "utf-8"))
+        #self.wfile.write(response.getvalue())
+
+    def __response_sn_patients(self):
+        pass
+    def __response_ar_patients(self):
+        pass
 
 '''
     def do_POST(self):
