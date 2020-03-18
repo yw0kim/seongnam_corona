@@ -14,7 +14,7 @@ def main():
     #                                  crawlClass.seongnam_track_list,
     #                                  crawlClass.around_track_list)
 
-    httpd = HTTPServer(('localhost', 19158), serve_api.MyHandler)
+    httpd = HTTPServer(('0.0.0.0', 19158), serve_api.MyHandler)
 
     buffer = 1
     sys.stderr = open('logfile.txt', 'w', buffer)
