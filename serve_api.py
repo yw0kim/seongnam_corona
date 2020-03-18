@@ -26,12 +26,12 @@ class MyHandler(SimpleHTTPRequestHandler):
     def __response_sn_stats(self):
         fr = open('data/sn_stats.txt', 'r')
         data = fr.read()
+        data = "성남시 코로나 현황\n"+data
+
         fr.close()
         self.send_response(200)
-#        self.send_header("Content-type", "text/plain")
         self.send_header("Content-type", "application/json")
         self.end_headers()
-        response = BytesIO()
         str_json = {
             "version": "2.0",
             "template":{
@@ -44,10 +44,7 @@ class MyHandler(SimpleHTTPRequestHandler):
                 ]
             }
         }
-        #response.write(bytes(data, 'utf-8'))
-        # response.write(json.dumps(data))
         self.wfile.write(bytes(json.dumps(str_json), "utf-8"))
-        #self.wfile.write(response.getvalue())
 
     def __response_sn_patients(self):
         pass
