@@ -33,7 +33,16 @@ class MyHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         response = BytesIO()
         str_json = {
-            "text":data
+            "version": "1.0",
+            "template":{
+                "outputs":[
+                    {
+                        "simpleText": {
+                            "text":data
+                        }
+                    }
+                ]
+            }
         }
         #response.write(bytes(data, 'utf-8'))
         # response.write(json.dumps(data))
