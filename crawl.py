@@ -1,6 +1,7 @@
 import requests
 import re
 from bs4 import BeautifulSoup
+import datetime
 # import datetime as pydatetime
 
 class CoronaCrawlClass:
@@ -54,10 +55,26 @@ class CoronaCrawlClass:
             before_contents_start = patient.end() + 7
 
         self.track_dict[before_patient_id] = patient_track_infos[before_contents_start:]
+        self.filter_by_week(1)
+
+    def filter_by_week(self, weeks):
+        p = re.compile('\d+월 \d+일')
+        today = datetime.datetime.today()
+
+        temp_dict = {}
+        for patient, info in self.track_dict.items():
+            confirm_date = p.findall(patient)
+            confirm_date = datetime.datetime.strptime('2020년' + confirm_date[0], '%Y년%m월 %d일')
+            delta = (today - confirm_date).days
+            if delta <= weeks*7 :
+                temp_dict[patient] = info
+
+        self.track_dict.clear()
+        self.track_dict = temp_dict
 
 
     def align_track_str(self):
-        p1 = re.compile('((\d+월 \d+일~\d+월 \d+일)|(\d+월 \d+일))')
+        p1 = re.compile('((\d+월 \d+일~\d+월 \d+일)|(\d+월 \d+일~\d+일)|(\d+월 \d+일))')
         p2 = re.compile('((\d+:\d+~\d+:\d+)|(\d+:\d+))')
 
         # align with p1 pattern
@@ -107,6 +124,12 @@ class CoronaCrawlClass:
         fw = open('data/sn_stats.txt', 'w')
         for key, value in self.stat_dict.items():
             fw.write(key + ' : ' +  value + '\n')
+        fw.close()
+
+        fw = open('data/all_patients.txt', 'w')
+        for patient, track_info in self.track_dict.items():
+            fw.write(patient + '\n')
+            fw.write(track_info + '\n')
         fw.close()
 
         fw = open('data/hp1_patients.txt', 'w')
