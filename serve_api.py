@@ -33,7 +33,7 @@ class MyHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         response = BytesIO()
         str_json = {
-            "version": "1.0",
+            "version": "2.0",
             "template":{
                 "outputs":[
                     {
