@@ -1,6 +1,7 @@
 import crawl
 import serve_api
 import sys
+import platform
 from http.server import HTTPServer
 
 def main():
@@ -13,8 +14,12 @@ def main():
     #Handler = serve_api.MyHandler(crawlClass.stat_dict,
     #                                  crawlClass.seongnam_track_list,
     #                                  crawlClass.around_track_list)
+    if platform.system() == 'Windows':
+        ip_str = 'localhost'
+    else:
+        ip_str = '0.0.0.0'
 
-    httpd = HTTPServer(('0.0.0.0', 19158), serve_api.MyHandler)
+    httpd = HTTPServer((ip_str, 19158), serve_api.MyHandler)
 
     buffer = 1
     sys.stderr = open('logfile.txt', 'w', buffer)

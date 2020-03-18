@@ -4,7 +4,7 @@ import json
 
 class MyHandler(SimpleHTTPRequestHandler):
 
-    def do_GET(self):
+    def do_POST(self):
         if self.headers['Authorization'] != '12034u8014u8r2ejd8123j1423412341adf1':
             self.send_response(502)
             self.end_headers()
@@ -38,7 +38,7 @@ class MyHandler(SimpleHTTPRequestHandler):
                 "outputs":[
                     {
                         "simpleText": {
-                            "text":data
+                            "text":str(data)
                         }
                     }
                 ]
